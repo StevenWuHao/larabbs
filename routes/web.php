@@ -45,3 +45,18 @@ Route::get('topics/{topic}/{slug?}', 'TopicsController@show')->name('topics.show
 Route::resource('replies', 'RepliesController', ['only' => ['store', 'destroy']]);
 
 Route::resource('notifications', 'NotificationsController', ['only' => ['index']]);
+
+Route::get('sso', function () {
+    $client = new \GuzzleHttp\Client();
+
+    $response = $client->get('http://sso.test/test?'.http_build_query([
+            'app_id' => 'ssouxkqrpx872mpu',
+            'secret' => '52ed9e8c9a74dc963817e52f55c3d4a3',
+        ]));
+    dd(json_decode($response->getBody(), true));
+    $result = json_decode((string)$response->getBody(), true);
+
+    if ($ticket = $result['ticket'] ?? null) {
+        return redirect('http://sso.test/sso/login?ticket='.$ticket);
+    }
+});
